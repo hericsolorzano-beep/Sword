@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sword-excel"
+version = "1.0.0"
+description = "Sword: limpia y une archivos Excel en segundos."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Heric" }]
+keywords = ["excel", "pandas", "automatizacion", "data", "csv", "xlsx"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Office/Business",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "pandas>=1.5",
+    "openpyxl>=3.1",
+    "xlrd>=2.0",
+    "rich>=13",
+]
+
+[project.urls]
+Homepage = "https://github.com/hericsolorzano-beep/Sword"
+
+[project.scripts]
+sword = "sword.cli:main"
+
+[tool.setuptools]
+packages = ["sword"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

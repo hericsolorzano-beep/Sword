@@ -1,4 +1,24 @@
+# Entornos
 .venv/
+venv/
 __pycache__/
 *.pyc
+*.pyo
+.pytest_cache/
+
+# Distribución / build
+build/
+dist/
+*.spec
+*.egg-info/
+
+# Salidas generadas
 resultado_*.xlsx
+resultado_*.csv
+out*.xlsx
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
