@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Compilar Sword.exe (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Compilar Sword.exe
+        run: pyinstaller --onefile --name Sword --console sword/cli.py
+
+      - name: Subir ejecutable como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: Sword-windows
+          path: dist/Sword.exe
+
+      - name: Publicar en GitHub Releases
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Sword.exe
+          generate_release_notes: true

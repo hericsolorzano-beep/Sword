@@ -10,6 +10,7 @@ y los entrega en **un solo archivo limpio y listo para usar**.
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![License](https://img.shields.io/badge/Licencia-MIT-green.svg?style=flat-square)](LICENSE)
 [![CI](https://img.shields.io/github/actions/workflow/status/hericsolorzano-beep/Sword/ci.yml?label=CI&style=flat-square)](https://github.com/hericsolorzano-beep/Sword/actions)
+[![Release](https://img.shields.io/github/v/release/hericsolorzano-beep/Sword?style=flat-square&label=Sword.exe)](https://github.com/hericsolorzano-beep/Sword/releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-%E2%9C%93-0078D6?style=flat-square&logo=windows&logoColor=white)]()
 [![Linux](https://img.shields.io/badge/Linux-%E2%9C%93-FCC624?style=flat-square&logo=linux&logoColor=white)]()
 [![macOS](https://img.shields.io/badge/macOS-%E2%9C%93-999999?style=flat-square&logo=apple&logoColor=white)]()
@@ -50,6 +51,10 @@ resultado_limpio.xlsx
 
 > ✅ Listo para abrir, mandar por correo o cargar en tu sistema.
 
+<p align="center">
+  <img src="docs/antes_despues.png" alt="Antes y después de usar Sword" width="100%">
+</p>
+
 ---
 
 ## ✨ Características
@@ -71,6 +76,15 @@ resultado_limpio.xlsx
 ## 🚀 Instalación
 
 ### 🪟 Windows — la forma fácil
+
+**💾 ¿Quieres el ejecutable sin instalar nada?** Descarga **`Sword.exe`** desde
+el [último Release](https://github.com/hericsolorzano-beep/Sword/releases/latest):
+funciona en **cualquier Windows sin Python instalado**. Solo arranca y usa la
+carpeta con tus Excel:
+
+```bat
+Sword.exe C:\Usuarios\TuNombre\Escritorio\mis_excels
+```
 
 1. **Cómo instalar Python** *(solo es la primera vez)*:
    - Descarga Python de <https://www.python.org/downloads/>
