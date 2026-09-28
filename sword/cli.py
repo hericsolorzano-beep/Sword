@@ -9,9 +9,11 @@ Uso típico:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import logging
 import sys
 from pathlib import Path
+from typing import NoReturn
 
 from rich import box
 from rich.console import Console
@@ -19,14 +21,14 @@ from rich.panel import Panel
 from rich.table import Table
 
 import sword
-from sword.core import SwordError, unir
+from sword.core import Resumen, SwordError, unir
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
 
 
 class _ArgumentParser(argparse.ArgumentParser):
-    def error(self, message: str) -> None:  # salida limpia de errores
+    def error(self, message: str) -> NoReturn:  # salida limpia de errores
         error_console.print(f"[bold]Error:[/bold] {message}")
         self.print_usage(file=sys.stderr)
         raise SystemExit(2)
@@ -60,7 +62,7 @@ def crear_parser() -> argparse.ArgumentParser:
         "-o", "--salida",
         default="resultado_limpio.xlsx",
         metavar="ARCHIVO",
-        help="Archivo de salida (.xlsx, .xls o .csv). Por defecto: resultado_limpio.xlsx",
+        help="Archivo de salida (.xlsx o .csv). Por defecto: resultado_limpio.xlsx",
     )
     parser.add_argument(
         "-r", "--recursivo",
@@ -71,7 +73,10 @@ def crear_parser() -> argparse.ArgumentParser:
         "-s", "--hoja",
         default="0",
         type=_tipo_hoja,
-        help="Nombre (o número, empezando en 0) de la hoja a leer. Por defecto: la primera",
+        help=(
+            "Nombre (o número, empezando en 0) de la hoja a leer. "
+            "Por defecto: la primera"
+        ),
     )
     parser.add_argument(
         "--columnas-comunes",
@@ -93,10 +98,35 @@ def crear_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Saltar la limpieza (espacios y filas vacías se conservan)",
     )
-    parser.add_argument("-q", "--quieto", action="store_true", help="Mostrar solo lo esencial")
-    parser.add_argument("-v", "--verboso", action="store_true", help="Mostrar detalle de cada archivo")
-    parser.add_argument("-V", "--version", action="version", version=f"sword {sword.__version__}")
+    parser.add_argument(
+        "-q", "--quieto", action="store_true", help="Mostrar solo lo esencial"
+    )
+    parser.add_argument(
+        "-v", "--verboso", action="store_true", help="Mostrar detalle de cada archivo"
+    )
+    parser.add_argument(
+        "-V", "--version", action="version", version=f"sword {sword.__version__}"
+    )
     return parser
+
+
+def _preparar_consola() -> None:
+    """Evita que Sword se caiga al imprimir en consolas antiguas.
+
+    La consola de Windows usa cp1252, que no tiene el símbolo "✔" ni los
+    emojis del resumen. Al no poder codificarlos, Python lanza
+    `UnicodeEncodeError` y el programa muere *justo en el mensaje de éxito*,
+    después de haber hecho bien todo el trabajo. Con `errors="replace"` el
+    carácter problemático se degrada en vez de tumbar la herramienta.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        # No toda salida admite reconfiguración: pytest sustituye los flujos por
+        # capturadores que no la tienen. Si no se puede, se deja como está.
+        reconfigurar = getattr(stream, "reconfigure", None)
+        if reconfigurar is None:
+            continue
+        with contextlib.suppress(ValueError, OSError):
+            reconfigurar(errors="replace")
 
 
 def _configurar_logging(verboso: bool = False, quieto: bool = False) -> None:
@@ -108,10 +138,12 @@ def _configurar_logging(verboso: bool = False, quieto: bool = False) -> None:
     )
 
 
-def _mostrar_resumen(resumen, quieto: bool = False, verboso: bool = False) -> None:
+def _mostrar_resumen(resumen: Resumen, quieto: bool = False) -> None:
     if quieto:
-        console.print(f"Listo: {resumen.archivos} archivo(s) -> {resumen.salida} "
-                      f"({resumen.filas_salida} filas)")
+        console.print(
+            f"Listo: {resumen.archivos} archivo(s) -> {resumen.salida} "
+            f"({resumen.filas_salida} filas)"
+        )
         return
 
     if resumen.filas_salida == 0:
@@ -144,12 +176,17 @@ def _mostrar_resumen(resumen, quieto: bool = False, verboso: bool = False) -> No
         f"[cyan]{resumen.columnas}[/cyan] columnas)."
     )
     if resumen.duplicados_eliminados:
-        console.print(f"  🗑  {resumen.duplicados_eliminados} fila(s) duplicada(s) eliminada(s)")
+        console.print(
+            f"  🗑  {resumen.duplicados_eliminados} fila(s) duplicada(s) eliminada(s)"
+        )
     if resumen.filas_vacias_eliminadas:
-        console.print(f"  🧹 {resumen.filas_vacias_eliminadas} fila(s) vacía(s) eliminada(s)")
+        console.print(
+            f"  🧹 {resumen.filas_vacias_eliminadas} fila(s) vacía(s) eliminada(s)"
+        )
 
 
 def main(argv: list[str] | None = None) -> int:
+    _preparar_consola()
     args = crear_parser().parse_args(argv)
     _configurar_logging(args.verboso, args.quieto)
 
@@ -177,7 +214,7 @@ def main(argv: list[str] | None = None) -> int:
         error_console.print("Reintenta con -v para ver el detalle técnico.")
         return 1
 
-    _mostrar_resumen(resumen, quieto=args.quieto, verboso=args.verboso)
+    _mostrar_resumen(resumen, quieto=args.quieto)
     return 0
 
 

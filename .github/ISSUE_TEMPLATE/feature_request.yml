@@ -1,0 +1,34 @@
+name: Propuesta
+description: Sugerir una mejora o una funcionalidad
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: textarea
+    id: problema
+    attributes:
+      label: ¿Qué problema resuelve?
+      description: >
+        Describe el trabajo manual que quieres evitar. Eso es más útil que la
+        solución que se te ocurre.
+    validations:
+      required: true
+  - type: textarea
+    id: propuesta
+    attributes:
+      label: ¿Qué te gustaría que hiciera Sword?
+    validations:
+      required: true
+  - type: dropdown
+    id: impacto
+    attributes:
+      label: ¿A quién le sirve?
+      options:
+        - Solo a mí
+        - A muchos usuarios de Sword
+        - A clientes que me piden automatizaciones
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas que ya conoces
+      description: >
+        Si otra herramienta ya lo resuelve, ¿por qué no te sirve? Ayuda a no
+        duplicar esfuerzo.

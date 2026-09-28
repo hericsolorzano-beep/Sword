@@ -7,13 +7,15 @@
 Deja de perder horas copiando y pegando celdas: Sword toma **todos** los Excel de una carpeta
 y los entrega en **un solo archivo limpio y listo para usar**.
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
-[![License](https://img.shields.io/badge/Licencia-MIT-green.svg?style=flat-square)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/hericsolorzano-beep/Sword/ci.yml?label=CI&style=flat-square)](https://github.com/hericsolorzano-beep/Sword/actions)
-[![Release](https://img.shields.io/github/v/release/hericsolorzano-beep/Sword?style=flat-square&label=Sword.exe)](https://github.com/hericsolorzano-beep/Sword/releases/latest)
-[![Windows](https://img.shields.io/badge/Windows-%E2%9C%93-0078D6?style=flat-square&logo=windows&logoColor=white)]()
-[![Linux](https://img.shields.io/badge/Linux-%E2%9C%93-FCC624?style=flat-square&logo=linux&logoColor=white)]()
-[![macOS](https://img.shields.io/badge/macOS-%E2%9C%93-999999?style=flat-square&logo=apple&logoColor=white)]()
+[![Python](https://img.shields.io/badge/Python-3.10%20--%203.13-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Pruebas](https://img.shields.io/github/actions/workflow/status/hericsolorzano-beep/Sword/ci.yml?label=pruebas&style=flat-square&logo=githubactions&logoColor=white)](https://github.com/hericsolorzano-beep/Sword/actions/workflows/ci.yml)
+[![Cobertura](https://img.shields.io/badge/cobertura-93%25-4c1?style=flat-square)](https://github.com/hericsolorzano-beep/Sword/actions/workflows/ci.yml)
+[![Tipos](https://img.shields.io/badge/tipos-mypy%20limpio-2a6f4b?style=flat-square)](https://mypy-lang.org/)
+[![Estilo](https://img.shields.io/badge/estilo-ruff%20limpio-261230?style=flat-square)](https://docs.astral.sh/ruff/)
+[![Licencia](https://img.shields.io/badge/licencia-MIT-0078D6?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/hericsolorzano-beep/Sword?style=flat-square&label=v)](https://github.com/hericsolorzano-beep/Sword/releases/latest)
+
+[⬇️ Descargar Sword](https://github.com/hericsolorzano-beep/Sword/releases/latest) · [🐛 Reportar un error](https://github.com/hericsolorzano-beep/Sword/issues) · [🤝 Contribuir](CONTRIBUTING.md)
 
 </div>
 
@@ -57,73 +59,64 @@ resultado_limpio.xlsx
 
 ---
 
-## ✨ Características
+## ✨ Qué hace
 
 | | |
 |---|---|
-| 🗂️ **Une todos los Excel** de una carpeta (`.xlsx`, `.xls`, `.xlsm`) |
-| 🚮 **Elimina filas duplicadas** (opción para conservarlas) |
+| 🗂️ **Une todos los Excel** de una carpeta: lee `.xlsx`, `.xls` y `.xlsm` |
+| 🚮 **Elimina filas duplicadas** (o conserva las que quieras con una opción) |
 | 🧹 **Quita filas vacías** y espacios sobrantes dentro de las celdas |
 | 🏷️ **Normaliza encabezados**: `Nombre Cliente` → `nombre_cliente` |
 | 📁 **Busca en subcarpetas** con `--recursivo` |
-| 📄 **Exporta a Excel o CSV** (`.xlsx`, `.xls`, `.csv`) |
-| 📊 **Resumen claro** de lo que hizo: archivos, filas, duplicados |
-| 🖥️ **Funciona igual en Windows, Linux y macOS** |
-| 🚀 **De cero a usarlo en 1 minuto** (instalador de un clic) |
+| 📄 **Exporta a `.xlsx` o `.csv`** |
+| 🔁 **Es idempotente**: puedes volver a ejecutarlo sin que se contamine |
+| 🖥️ **Probado en Windows, Linux y macOS**, en Python 3.10 a 3.13 |
+| 🚀 **De cero a usarlo en 1 minuto** |
 
 ---
 
 ## 🚀 Instalación
 
-### 🪟 Windows — la forma fácil
+### 🪟 Sin instalar nada
 
-**💾 ¿Quieres el ejecutable sin instalar nada?** Descarga **`Sword.exe`** desde
-el [último Release](https://github.com/hericsolorzano-beep/Sword/releases/latest):
-funciona en **cualquier Windows sin Python instalado**. Solo arranca y usa la
-carpeta con tus Excel:
+**💾 Descarga el binario** desde el
+[último Release](https://github.com/hericsolorzano-beep/Sword/releases/latest).
+**Ningún ejecutable necesita Python instalado.**
 
-```bat
-Sword.exe C:\Usuarios\TuNombre\Escritorio\mis_excels
-```
+| Sistema | Archivo | Cómo usarlo |
+|---|---|---|
+| Windows | `Sword.exe` | doble clic, o `Sword.exe CARPETA` |
+| macOS | `Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
+| Linux | `Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
 
-1. **Cómo instalar Python** *(solo es la primera vez)*:
-   - Descarga Python de <https://www.python.org/downloads/>
-   - Al instalar, **marca la casilla "Add Python to PATH"** ✅
+> La **v1.0.0** solo traía el binario de Windows. Desde la v1.1.0 el proceso de
+> publicación compila y verifica los tres sistemas, así que la
+> [página de releases](https://github.com/hericsolorzano-beep/Sword/releases/latest)
+> es la fuente de verdad sobre qué hay disponible ahora mismo.
 
-2. **Instala Sword de un clic**: descarga el proyecto (botón verde *Code* → *Download ZIP*),
-   descomprime y **doble clic sobre `instalar_windows.bat`**. Espera a que termine.
+En Windows también puedes arrastrar la carpeta con tus Excel encima del
+ejecutable.
 
-3. **Úsalo**: doble clic sobre **`sword.bat`** (te pide la carpeta con los Excel)
-   o abre una terminal:
-
-   ```bat
-   sword C:\Usuarios\TuNombre\Escritorio\mis_excels
-   ```
-
-> 💡 **¿No quieres instalar Python en el PC de tu cliente?** Ejecuta `compilar_exe.bat`
-> una vez y obtienes **`dist\Sword.exe`**: un ejecutable único que **funciona en
-> cualquier Windows sin Python instalado**.
-
-### 🐧 Linux / macOS — la forma fácil
+### 🐧 Instalador para Linux y macOS
 
 ```bash
+git clone https://github.com/hericsolorzano-beep/Sword
+cd Sword
 ./instalar.sh
 ```
 
-Listo. Después úsalo así:
+### 🪟 Instalador de un clic para Windows
 
-```bash
-.venv/bin/sword ~/Documentos/mis_excels
-```
+1. Instala Python desde <https://www.python.org/downloads/> y **marca
+   *"Add Python to PATH"*** ✅ *(solo la primera vez)*.
+2. Descarga el proyecto (*Code* → *Download ZIP*) y descomprime.
+3. **Doble clic en `instalar_windows.bat`** y espera a que termine.
 
-> 🛠️ **Atajo**: `export PATH="$HOME/.local/bin:$PATH"` y luego basta `sword ...`.
-
-### 📦 Instalación por si te gusta Python
+### 🐍 Con Python
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate        # en Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+source .venv/bin/activate          # en Windows: .venv\Scripts\activate
 pip install -e .
 sword --version
 ```
@@ -136,23 +129,20 @@ sword --version
 sword CARPETA_CON_EXCELS
 ```
 
-Ejemplos:
-
 | Comando | Qué hace |
 |---|---|
 | `sword ventas` | Une todos los Excel de `ventas` en `resultado_limpio.xlsx` |
 | `sword ventas -o total.xlsx` | Guarda el resultado con otro nombre |
-| `sword ventas -o datos.csv` | Exporta a CSV |
+| `sword ventas -o datos.csv` | Exporta a CSV (con `utf-8-sig`, lo abre Excel sin pasos extra) |
 | `sword ventas -r` | Incluye archivos dentro de subcarpetas |
 | `sword ventas --conservar-duplicados` | No borrar filas repetidas |
 | `sword ventas --sin-limpiar` | Únirlos tal cual (sin limpieza) |
-| `sword ventas --columnas-comunes` | Conserva solo las columnas que están en todos |
+| `sword ventas --columnas-comunes` | Conserva solo las columnas que están en todos, en el orden del primer archivo |
 | `sword ventas -s "Hoja2"` | Lee una hoja concreta de cada archivo |
+| `sword ventas -v` | Detalle de cada archivo (útil para depurar) |
 | `sword --version` | Muestra la versión |
 
 ### Ejemplo real
-
-Dentro de la carpeta del proyecto hay una carpeta de prueba:
 
 ```bash
 sword datos_prueba -v
@@ -162,7 +152,7 @@ sword datos_prueba -v
 DEBUG Archivos encontrados: ['ventas_ene.xlsx', 'ventas_feb.xlsx']
 DEBUG ventas_ene.xlsx       entrada=3 salida=3
 DEBUG ventas_feb.xlsx       entrada=4 salida=3
-                        Resumen
+                         Resumen
 ╭─────────────────┬──────────────────┬─────────────────╮
 │ Archivo         │ Filas de entrada │ Filas de salida │
 ├─────────────────┼──────────────────┼─────────────────┤
@@ -175,31 +165,93 @@ DEBUG ventas_feb.xlsx       entrada=4 salida=3
   🧹 1 fila(s) vacía(s) eliminada(s)
 ```
 
+### Sword también es una librería
+
+El núcleo no depende de la consola, así que puedes llamarlo desde otro script:
+
+```python
+from pathlib import Path
+from sword.core import unir
+
+resumen = unir(Path("ventas"), Path("total.xlsx"))
+print(resumen.archivos, resumen.filas_salida, resumen.duplicados_eliminados)
+```
+
+---
+
+## 🔧 Cómo está construido
+
+Un proyecto pequeño, pero con las prácticas que se esperan de software que
+alguien más va a mantener:
+
+| | |
+|---|---|
+| 🧱 **Núcleo y consola separados** | `sword/core.py` no sabe nada de `argparse` ni de la terminal, y se puede usar como librería. `sword/cli.py` solo traduce argumentos y formatea la salida. |
+| 🧪 **39 pruebas automatizadas** | Cubren el camino feliz, los datos sucios, los errores y los límites. Cobertura del **93 %**, con un mínimo del 85 % exigido en la CI. |
+| ✅ **Integración continua** | Cada *push* corre las pruebas en **Windows, Linux y macOS** y en **Python 3.10 a 3.13**. Si algo se rompe, se ve en el pull request, no en el cliente. |
+| 🔍 **Linter y tipos** | `ruff` y `mypy` limpios, configurados en `pyproject.toml` y exigidos en la CI. |
+| 🚪 **Errores que se pueden leer** | El cliente final nunca ve un *traceback*: recibe una frase que dice qué hacer. Con `-v` sí se obtiene el detalle técnico. |
+| 📦 **Instalable y publicable** | `pyproject.toml` con la versión declarada en un solo sitio, y binarios para los tres sistemas generados y verificados automáticamente en cada release. |
+| 🔒 **Sin red** | Sword no hace ninguna llamada a internet. Tus datos no salen del equipo. |
+
+### Estructura
+
+```text
+sword/
+├── core.py          # leer, limpiar y unir (sin dependencias de la consola)
+├── cli.py           # argumentos, salida formateada y códigos de salida
+└── __main__.py      # permite `python -m sword`
+tests/               # 39 pruebas, incluidas las de regresión de cada bug
+.github/workflows/  # CI (pruebas + lint + tipos) y release de binarios
+```
+
+### Desarrollo
+
+```bash
+make install     # entorno + herramientas
+make check       # lo mismo que corre la CI: test + lint + tipos
+make test        # solo pruebas, con cobertura
+make demo        # regenera la salida de ejemplo
+```
+
+Los cambios siguen [Conventional Commits](CONTRIBUTING.md) y cada corrección de
+bug trae su prueba de regresión. El historial de cambios está en
+[CHANGELOG.md](CHANGELOG.md).
+
+---
+
+## ⚠️ Límites conocidos
+
+Por transparencia, esto es lo que Sword **no** hace:
+
+- **No escribe `.xls`** (el formato antiguo de Excel). Sí los **lee**, pero si
+  le pides guardar en `.xls` te avisa y te sugiere `.xlsx` o `.csv`. Antes
+  escribía un archivo con extensión mentirosa; ahora lo dice.
+- **No sabe qué dos columnas son "la misma" con distinto nombre.** Si un mes
+  la columna se llama `Edad` y al otro `EDAD_PERSONA`, Sword las une como dos
+  columnas distintas. Para eso está `--conservar-columnas` y, si hace falta,
+  normalizar a mano antes.
+- **No lee archivos cifrados ni con contraseña.**
+- **No programa nada:** no deja tareas automáticas en el sistema. Eso lo pones
+  tú con el programador de tareas de Windows o con `cron`.
+- La salida por defecto se llama `resultado_limpio.xlsx` y se escribe en la
+  carpeta de trabajo. **Tus archivos originales nunca se tocan**, pero conviene
+  no guardarlos con ese mismo nombre.
+
 ---
 
 ## 🆘 Solución de problemas
 
 | Problema | Solución |
 |---|---|
-| **"No se encontró Python"** | Marca *"Add Python to PATH"* al instalar Python y reinicia |
-| **"No se encontraron archivos Excel"** | Revisa que la carpeta tenga `.xlsx`/`.xls` y estés apuntando a la correcta |
-| **Resultado sin filas** | Revisa que la hoja correcta tenga datos (`-s "NombreHoja"` para elegir hoja) |
-| **No lee archivos `.xls` viejos** | Asegúrate de que sea un `.xls` real de Excel (no un CSV renombrado) |
-| **El programa no responde** | Control + C lo detiene de forma segura |
-| **Puedo usarlo con mis propios datos?** | Sí, siempre crea una copia de tus originales primero |
-
----
-
-## 🔧 Desarrollo y pruebas
-
-```bash
-make test        # o: pytest
-make demo        # regenera el ejemplo de salida
-```
-
-Sword viene con pruebas automatizadas que se ejecutan en **Windows y Linux**
-(cada *push* a GitHub corriendo también en macOS/Linux) para que siempre
-funcione igual en todas las plataformas.
+| **"No se encontró Python"** (instalador Windows) | Reinstala Python marcando *"Add Python to PATH"* y reinicia la terminal |
+| **"No se encontraron archivos Excel"** | Revisa que la carpeta tenga `.xlsx`/`.xls` y que estés apuntando a la correcta |
+| **"No se puede guardar en .xls"** | Es a propósito: guarda como `.xlsx` o `.csv`, que abren todos los Excel |
+| **Resultado sin filas** | Revisa que la hoja correcta tenga datos: `-s "NombreHoja"` elige hoja |
+| **Columnas que no se unifican** | Sus encabezados difieren entre archivos. Revísalos o usa `--conservar-columnas` |
+| **No lee archivos `.xls` viejos** | Debe ser un `.xls` real de Excel, no un CSV renombrado |
+| **El programa no responde** | `Control + C` lo detiene de forma segura |
+| **Sale "Permiso denegado" en Linux/macOS** | El binario perdió el permiso de ejecución: `chmod +x Sword` |
 
 ---
 
@@ -216,7 +268,7 @@ le ahorran **horas cada mes** a personas y negocios.
 > *"No automatizo por automatizar: automatizo para que tengas más tiempo para
 > lo importante."*
 
-**Autor:** Heric — disponible para proyectos freelance.
+**Autor:** Heric Solorzano — disponible para proyectos freelance.
 📬 <https://github.com/hericsolorzano-beep>
 
 ---

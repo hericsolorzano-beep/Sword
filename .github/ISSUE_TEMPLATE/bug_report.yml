@@ -1,0 +1,66 @@
+name: Error
+description: Algo no funciona como debería
+labels: ["bug", "needs-triage"]
+body:
+  - type: textarea
+    id: que-pasa
+    attributes:
+      label: ¿Qué ocurre?
+      description: Cuéntame qué esperabas y qué pasó en su lugar.
+    validations:
+      required: true
+  - type: textarea
+    id: como-reproducir
+    attributes:
+      label: ¿Cómo se reproduce?
+      description: El comando que ejecutaste y qué archivos usaste.
+      placeholder: |
+        sword ventas -o total.xlsx
+    validations:
+      required: true
+  - type: textarea
+    id: mensaje
+    attributes:
+      label: Mensaje completo de la consola
+      render: text
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Versión de Sword
+      placeholder: "1.1.0 (sword --version)"
+    validations:
+      required: true
+  - type: dropdown
+    id: sistema
+    attributes:
+      label: Sistema operativo
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Otro
+    validations:
+      required: true
+  - type: input
+    id: python
+    attributes:
+      label: Versión de Python (si instalaste desde el código)
+      placeholder: "3.12.3"
+  - type: textarea
+    id: datos
+    attributes:
+      label: Sobre tus archivos de entrada
+      description: >
+        Solo si es relevante: cantidad de archivos, si tienen encabezados
+        distintos entre sí, si son .xlsx o .xls. NO adjuntes datos personales
+        ni confidenciales.
+
+  - type: checkboxes
+    id: originales
+    attributes:
+      label: Antes de continuar
+      options:
+        - label: Trabajé en una copia de mis archivos, no en los originales.
+          required: true
