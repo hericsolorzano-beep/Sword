@@ -94,7 +94,7 @@ jobs:
       # Nota: `generate_release_notes` solo se aplica si `body` viene vacío, así
       # que aquí se usa únicamente el body escrito a mano.
       - name: Publicar los tres binarios
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: binarios/*
           body: |
