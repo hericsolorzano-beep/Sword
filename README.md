@@ -86,8 +86,8 @@ resultado_limpio.xlsx
 | Sistema | Archivo | Cómo usarlo |
 |---|---|---|
 | Windows | `Sword.exe` | doble clic, o `Sword.exe CARPETA` |
-| macOS | `Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
-| Linux | `Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
+| macOS | `Sword-macos` | `chmod +x Sword-macos` y luego `./Sword-macos CARPETA` |
+| Linux | `Sword-linux` | `chmod +x Sword-linux` y luego `./Sword-linux CARPETA` |
 
 > La **v1.0.0** solo traía el binario de Windows. Desde la v1.1.0 el proceso de
 > publicación compila y verifica los tres sistemas, así que la

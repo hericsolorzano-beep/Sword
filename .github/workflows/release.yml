@@ -7,22 +7,34 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
-    name: Sword.exe · ${{ matrix.os }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
-    # Compilar no necesita escribir en el repositorio; solo el job `publicar`.
     permissions:
       contents: read
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { os: windows-latest, artifact: Sword-windows,   binary: dist/Sword.exe }
-          - { os: macos-latest,   artifact: Sword-macos,     binary: dist/Sword }
-          - { os: ubuntu-latest,  artifact: Sword-linux,     binary: dist/Sword }
+          # `binary_name` debe ser ÚNICO por plataforma: GitHub publica los
+          # adjuntos por su nombre base, así que dos binarios llamados "Sword"
+          # (macOS y Linux) se pisarían y el release acabaría con menos
+          # archivos de los previstos.
+          - name: Windows
+            os: windows-latest
+            binary_name: Sword.exe
+            artifact: Sword-windows
+          - name: macOS
+            os: macos-latest
+            binary_name: Sword-macos
+            artifact: Sword-macos
+          - name: Linux
+            os: ubuntu-latest
+            binary_name: Sword-linux
+            artifact: Sword-linux
 
     steps:
       - uses: actions/checkout@v4
@@ -41,56 +53,66 @@ jobs:
           pip install pyinstaller
 
       - name: Compilar ejecutable
-        run: pyinstaller --onefile --name Sword --console sword/cli.py
+        run: pyinstaller --onefile --name ${{ matrix.binary_name }} --console sword/cli.py
 
-      - name: Comprobar que arranca
+      - name: Comprobar que el binario arranca
         shell: bash
         run: |
-          chmod +x "${{ matrix.binary }}"
-          # --version es inocuo: valida que el binario arranca y encuentra sus
-          # dependencias empaquetadas sin tocar datos del usuario.
-          "${{ matrix.binary }}" --version
+          chmod +x dist/* || true
+          # `--version` es inocuo: valida que el arranque y las dependencias
+          # empaquetadas funcionan sin tocar datos del usuario.
+          ./dist/${{ matrix.binary_name }} --version
 
       - name: Subir ejecutable como artefacto
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: ${{ matrix.binary }}
+          path: dist/${{ matrix.binary_name }}
 
   publicar:
     name: Publicar en GitHub Releases
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
           path: binarios
+          merge-multiple: true
+
+      - name: Comprobar que llegaron los tres binarios
+        run: |
+          ls -la binarios
+          for esperado in Sword.exe Sword-macos Sword-linux; do
+            test -f "binarios/$esperado" || {
+              echo "::error::falta el binario $esperado en el release"
+              exit 1
+            }
+          done
 
       # Nota: `generate_release_notes` solo se aplica si `body` viene vacío, así
       # que aquí se usa únicamente el body escrito a mano.
       - name: Publicar los tres binarios
         uses: softprops/action-gh-release@v2
         with:
-          files: binarios/**/*
+          files: binarios/*
           body: |
             ## Sword ${{ github.ref_name }}
 
             | Sistema | Archivo | Cómo usarlo |
             |---|---|---|
-            | Windows | `Sword-windows/Sword.exe` | Doble clic. No necesita Python. |
-            | macOS | `Sword-macos/Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
-            | Linux | `Sword-linux/Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
+            | Windows | `Sword.exe` | doble clic, o `Sword.exe CARPETA` |
+            | macOS | `Sword-macos` | `chmod +x Sword-macos` y luego `./Sword-macos CARPETA` |
+            | Linux | `Sword-linux` | `chmod +x Sword-linux` y luego `./Sword-linux CARPETA` |
 
+            Los tres se compilan y se prueban en la CI antes de publicarse.
             Ejemplo:
 
             ```
             Sword.exe C:\Usuarios\TuNombre\Escritorio\mis_excels
             ```
 
-            ## Qué cambió
-
-            El detalle de cada versión está en el
+            Sword también se puede usar como librería desde Python. Los detalles
+            de esta versión están en el
             [CHANGELOG](https://github.com/hericsolorzano-beep/Sword/blob/main/CHANGELOG.md).
