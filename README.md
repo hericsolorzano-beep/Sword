@@ -9,7 +9,7 @@ y los entrega en **un solo archivo limpio y listo para usar**.
 
 [![Python](https://img.shields.io/badge/Python-3.10%20--%203.13-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Pruebas](https://img.shields.io/github/actions/workflow/status/hericsolorzano-beep/Sword/ci.yml?label=pruebas&style=flat-square&logo=githubactions&logoColor=white)](https://github.com/hericsolorzano-beep/Sword/actions/workflows/ci.yml)
-[![Cobertura](https://img.shields.io/badge/cobertura-93%25-4c1?style=flat-square)](https://github.com/hericsolorzano-beep/Sword/actions/workflows/ci.yml)
+[![Cobertura](https://img.shields.io/badge/cobertura-92%25-4c1?style=flat-square)](https://github.com/hericsolorzano-beep/Sword/actions/workflows/ci.yml)
 [![Tipos](https://img.shields.io/badge/tipos-mypy%20limpio-2a6f4b?style=flat-square)](https://mypy-lang.org/)
 [![Estilo](https://img.shields.io/badge/estilo-ruff%20limpio-261230?style=flat-square)](https://docs.astral.sh/ruff/)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-0078D6?style=flat-square)](LICENSE)
@@ -187,7 +187,7 @@ alguien más va a mantener:
 | | |
 |---|---|
 | 🧱 **Núcleo y consola separados** | `sword/core.py` no sabe nada de `argparse` ni de la terminal, y se puede usar como librería. `sword/cli.py` solo traduce argumentos y formatea la salida. |
-| 🧪 **39 pruebas automatizadas** | Cubren el camino feliz, los datos sucios, los errores y los límites. Cobertura del **93 %**, con un mínimo del 85 % exigido en la CI. |
+| 🧪 **40 pruebas automatizadas** | Cubren el camino feliz, los datos sucios, los errores y los límites. Cobertura del **92 %**, con un mínimo del 85 % exigido en la CI. |
 | ✅ **Integración continua** | Cada *push* corre las pruebas en **Windows, Linux y macOS** y en **Python 3.10 a 3.13**. Si algo se rompe, se ve en el pull request, no en el cliente. |
 | 🔍 **Linter y tipos** | `ruff` y `mypy` limpios, configurados en `pyproject.toml` y exigidos en la CI. |
 | 🚪 **Errores que se pueden leer** | El cliente final nunca ve un *traceback*: recibe una frase que dice qué hacer. Con `-v` sí se obtiene el detalle técnico. |
@@ -201,7 +201,7 @@ sword/
 ├── core.py          # leer, limpiar y unir (sin dependencias de la consola)
 ├── cli.py           # argumentos, salida formateada y códigos de salida
 └── __main__.py      # permite `python -m sword`
-tests/               # 39 pruebas, incluidas las de regresión de cada bug
+tests/               # 40 pruebas, incluidas las de regresión de cada bug
 .github/workflows/  # CI (pruebas + lint + tipos) y release de binarios
 ```
 
