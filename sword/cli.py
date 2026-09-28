@@ -9,6 +9,7 @@ Uso típico:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import logging
 import sys
 from pathlib import Path
@@ -109,6 +110,25 @@ def crear_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _preparar_consola() -> None:
+    """Evita que Sword se caiga al imprimir en consolas antiguas.
+
+    La consola de Windows usa cp1252, que no tiene el símbolo "✔" ni los
+    emojis del resumen. Al no poder codificarlos, Python lanza
+    `UnicodeEncodeError` y el programa muere *justo en el mensaje de éxito*,
+    después de haber hecho bien todo el trabajo. Con `errors="replace"` el
+    carácter problemático se degrada en vez de tumbar la herramienta.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        # No toda salida admite reconfiguración: pytest sustituye los flujos por
+        # capturadores que no la tienen. Si no se puede, se deja como está.
+        reconfigurar = getattr(stream, "reconfigure", None)
+        if reconfigurar is None:
+            continue
+        with contextlib.suppress(ValueError, OSError):
+            reconfigurar(errors="replace")
+
+
 def _configurar_logging(verboso: bool = False, quieto: bool = False) -> None:
     nivel = logging.WARNING if quieto else (logging.DEBUG if verboso else logging.INFO)
     logging.basicConfig(
@@ -166,6 +186,7 @@ def _mostrar_resumen(resumen: Resumen, quieto: bool = False) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
+    _preparar_consola()
     args = crear_parser().parse_args(argv)
     _configurar_logging(args.verboso, args.quieto)
 

@@ -8,6 +8,15 @@ y el proyecto usa [versiones semánticas](https://semver.org/lang/es/).
 
 ### Corregido
 
+- **Sword ya no se cae en Windows al terminar.** En la consola de Windows
+  (codificación cp1252) no existen el símbolo `✔` ni los emojis del resumen. Al
+  no poder codificarlos, Python lanzaba `UnicodeEncodeError` y el programa
+  terminaba **con error después de haber unido los archivos correctamente**: el
+  cliente veía un fallo justo en el mensaje de éxito. Ahora los flujos de
+  salida se reconfiguran con `errors="replace"` y el carácter se degrada en vez
+  de tumbar la herramienta. Este defecto no lo detectaban las pruebas
+  anteriores porque capturaban la salida sin pasar por una consola real; lo
+  encontró la CI en `windows-latest`, que es justo para lo que sirve.
 - **Sword ya no relee su propia salida.** Cuando la salida se guardaba dentro de
   la carpeta de entrada —cosa que pasa por defecto si ejecutas Sword desde
   dentro de esa carpeta, o si usas `-o` con una ruta dentro de ella— el programa

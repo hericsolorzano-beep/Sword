@@ -1,6 +1,7 @@
 """Pruebas de la interfaz de consola (comportamiento del comando `sword`)."""
 
 import contextlib
+import io
 import pathlib
 import subprocess
 import sys
@@ -74,6 +75,28 @@ class TestCli:
         with pytest.raises(SystemExit) as exc:
             main(["--opcion-que-no-existe"])
         assert exc.value.code == 2
+
+    def test_no_se_cae_en_una_consola_que_no_soporta_los_simbolos(
+        self, tmp_path, monkeypatch
+    ):
+        """Regresión: en Windows Sword moría al imprimir el mensaje de éxito.
+
+        La consola de Windows usa cp1252, que no tiene el símbolo "✔" ni los
+        emojis del resumen. Sin `errors="replace"`, Python lanzaba
+        UnicodeEncodeError y el programa terminaba con error *después* de haber
+        unido los archivos correctamente. Lo detectó la CI en windows-latest.
+        """
+        buffer = io.BytesIO()
+        # errors="strict" es el comportamiento por defecto: es lo que falla.
+        consola = io.TextIOWrapper(buffer, encoding="cp1252", errors="strict")
+        monkeypatch.setattr(sys, "stdout", consola)
+        monkeypatch.setattr(sys, "stderr", consola)
+
+        _crear_excels(tmp_path / "datos")
+        codigo = main([str(tmp_path / "datos"), "-o", str(tmp_path / "o.xlsx")])
+
+        assert codigo == 0, "Sword no debe fallar por la codificación de la consola"
+        assert not isinstance(codigo, str)
 
 
 class TestModulo:
