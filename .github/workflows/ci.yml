@@ -18,7 +18,7 @@ jobs:
     name: Lint y tipos
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
@@ -62,7 +62,7 @@ jobs:
           - { os: macos-latest,   python-version: "3.13" }
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
@@ -95,7 +95,7 @@ jobs:
     name: El comando instalado funciona
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
