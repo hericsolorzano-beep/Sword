@@ -1,0 +1,22 @@
+version: 2
+
+updates:
+  # Dependencias de ejecución: patch y minor. Las majors se revisan a mano
+  # porque pandas 3.x cambió comportamiento y una major 4 traería otra.
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels: ["dependencies"]
+    groups:
+      python-minor:
+        update-types: ["minor", "patch"]
+
+  # Acciones de GitHub: se mantiene todo al día (dependencias transitivas).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels: ["dependencies", "github-actions"]

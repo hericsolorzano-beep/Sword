@@ -1,0 +1,10 @@
+name: Configuración de contribuciones
+description: Plantillas de pull request y contacto
+
+contact_links:
+  - name: Reportar un problema de seguridad
+    url: https://github.com/hericsolorzano-beep/Sword/security/advisories/new
+    about: No abras un issue público para fallos de seguridad.
+  - name: Discusión
+    url: https://github.com/hericsolorzano-beep/Sword/discussions
+    about: Preguntas, ideas y peticiones de funcionalidades.

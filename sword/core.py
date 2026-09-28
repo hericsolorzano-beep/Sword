@@ -37,13 +37,25 @@ class Resumen:
     """Lista de (archivo, filas de entrada, filas de salida)."""
 
 
-def hallar_archivos(carpeta: Path, recursivo: bool = False) -> list[Path]:
-    """Devuelve todos los archivos Excel dentro de `carpeta`, ordenados."""
+def hallar_archivos(
+    carpeta: Path,
+    recursivo: bool = False,
+    *,
+    excluir: Path | None = None,
+) -> list[Path]:
+    """Devuelve todos los archivos Excel dentro de `carpeta`, ordenados.
+
+    `excluir` ignora un archivo concreto. Sword lo usa para no releer su propia
+    salida cuando ésta queda guardada dentro de la carpeta de entrada.
+    """
     carpeta = Path(carpeta)
     if not carpeta.is_dir():
-        raise SwordError(f'No existe la carpeta "{carpeta}". Revisa la ruta e inténtalo de nuevo.')
+        raise SwordError(
+            f'No existe la carpeta "{carpeta}". Revisa la ruta e inténtalo de nuevo.'
+        )
 
     generador = carpeta.rglob("*") if recursivo else carpeta.glob("*")
+    descartado = Path(excluir).resolve() if excluir is not None else None
     archivos = sorted(
         p
         for p in generador
@@ -51,6 +63,7 @@ def hallar_archivos(carpeta: Path, recursivo: bool = False) -> list[Path]:
         and p.suffix.lower() in EXTENSIONES_EXCEL
         and not p.name.startswith("~$")
         and not p.name.startswith(".")
+        and (descartado is None or p.resolve() != descartado)
     )
     if not archivos:
         ext = ", ".join(EXTENSIONES_EXCEL)
@@ -89,7 +102,11 @@ def limpiar_texto(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _dropear_columnas_espurias(df: pd.DataFrame) -> pd.DataFrame:
-    espias = [c for c in df.columns if str(c).lower() == "nan" or str(c).startswith("Unnamed:")]
+    espias = [
+        c
+        for c in df.columns
+        if str(c).lower() == "nan" or str(c).startswith("Unnamed:")
+    ]
     if espias:
         df = df.drop(columns=espias)
     return df
@@ -107,10 +124,13 @@ def leer_excel(
     except Exception as exc:  # noqa: BLE001 - se convierte en error amigable
         raise SwordError(f'No pude leer "{ruta.name}". Motivo: {exc}') from exc
 
-    if not df.empty:
-        df = _dropear_columnas_espurias(df)
-        if not conservar_columnas:
-            df = normalizar_columnas(df)
+    # Las columnas espurias se quitan siempre, tengan filas o no: un Excel vacío
+    # exportado con índice deja un "Unnamed: 0" que, si sobrevive, contamina la
+    # intersección de `--columnas-comunes` y termina descartando todas las
+    # columnas de los demás archivos.
+    df = _dropear_columnas_espurias(df)
+    if not conservar_columnas:
+        df = normalizar_columnas(df)
     return df
 
 
@@ -126,7 +146,8 @@ def unir(
     limpiar: bool = True,
 ) -> Resumen:
     """Une todos los Excel de `carpeta` en uno limpio y lo guarda en `salida`."""
-    archivos = hallar_archivos(carpeta, recursivo)
+    salida = ruta_de_salida(salida)
+    archivos = hallar_archivos(carpeta, recursivo, excluir=salida)
 
     frames: list[pd.DataFrame] = []
     resumen = Resumen()
@@ -143,16 +164,25 @@ def unir(
             df = filas_vacias.reset_index(drop=True)
 
         frames.append(df)
-        total_out = sum(len(f) for f in frames)
         resumen.detalles.append((ruta.name, antes, len(df)))
         resumen.filas_entrada += antes
-        log.debug('%-40s entrada=%d salida=%d', ruta.name, antes, len(df))
+        log.debug("%-40s entrada=%d salida=%d", ruta.name, antes, len(df))
 
     if columnas_comunes and frames:
-        comunes = set(frames[0].columns)
-        for df in frames[1:]:
-            comunes &= set(df.columns)
-        frames = [df[list(comunes)] for df in frames]
+        # Un archivo sin encabezados no aporta columnas, pero tampoco puede
+        # decir que "no comparte" ninguna: si entrara en la intersección la
+        # vaciaría y se perderían los datos de todos los demás, en silencio.
+        con_columnas = [f for f in frames if len(f.columns)]
+        if con_columnas:
+            # La base es el primer archivo *con* columnas, y el orden sale de
+            # ella y no de un set: el orden de un set de cadenas cambia entre
+            # ejecuciones y haría la salida irreproducible.
+            base = con_columnas[0]
+            comunes = set(base.columns)
+            for df in con_columnas[1:]:
+                comunes &= set(df.columns)
+            orden = [c for c in base.columns if c in comunes]
+            frames = [df[orden] if len(df.columns) else df for df in frames]
 
     combinado = pd.concat(frames, ignore_index=True, sort=False)
     combinado = _dropear_columnas_espurias(combinado)
@@ -173,19 +203,49 @@ def unir(
     return resumen
 
 
-def _escribir(df: pd.DataFrame, salida: Path) -> Path:
+def ruta_de_salida(salida: Path) -> Path:
+    """Normaliza la ruta de salida antes de leer o escribir nada.
+
+    Solo se admiten `.xlsx` y `.csv`. Cualquier otra extensión se cambia a
+    `.xlsx`, salvo `.xls`, que se rechaza: el formato antiguo de Excel no se
+    puede escribir de forma fiable y produciría un archivo con extensión
+    mentirosa.
+
+    La extensión se devuelve siempre en minúsculas porque algunos escritores
+    eligen el motor de forma literal y no aceptan un nombre como "OUT.XLSX".
+    """
     salida = Path(salida)
+    if not salida.name:
+        raise SwordError(
+            "Falta el nombre del archivo de salida. "
+            'Prueba con: sword ventas -o total.xlsx'
+        )
+
+    extension = salida.suffix.lower()
+
+    if extension == ".xls":
+        raise SwordError(
+            'No se puede guardar en ".xls" (formato antiguo de Excel). '
+            'Usa ".xlsx" o ".csv": los dos se abren en cualquier Excel.'
+        )
+    if extension in (".csv", ".xlsx"):
+        # Se reconstruye la ruta para dejar la extensión en minúsculas: algunos
+        # escritores eligen el motor de forma literal y no aceptan "OUT.XLSX".
+        return salida.with_suffix(extension)
+    return salida.with_suffix(".xlsx")
+
+
+def _escribir(df: pd.DataFrame, salida: Path) -> Path:
+    """Escribe el DataFrame. `salida` debe venir de `ruta_de_salida`."""
     if salida.suffix.lower() == ".csv":
         salida.parent.mkdir(parents=True, exist_ok=True)
         df.to_csv(salida, index=False, encoding="utf-8-sig")
         return salida
 
-    if salida.suffix.lower() not in (".xlsx", ".xls"):
-        salida = salida.with_suffix(".xlsx")
     salida.parent.mkdir(parents=True, exist_ok=True)
     if df.empty:
+        # openpyxl no puede escribir una hoja sin filas: se añade una columna
+        # vacía solo para que el archivo exista y sea abrible.
         df = df.assign(__sword_placeholder__=pd.Series(dtype="float"))
-        df.to_excel(salida, index=False)
-        return salida
     df.to_excel(salida, index=False)
     return salida

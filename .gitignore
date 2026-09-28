@@ -5,6 +5,8 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # Distribución / build
 build/
@@ -16,6 +18,11 @@ dist/
 resultado_*.xlsx
 resultado_*.csv
 out*.xlsx
+
+# Cobertura
+.coverage
+coverage.xml
+htmlcov/
 
 # Editor
 .vscode/

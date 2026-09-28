@@ -11,8 +11,18 @@ permissions:
 
 jobs:
   build:
-    name: Compilar Sword.exe (Windows)
-    runs-on: windows-latest
+    name: Sword.exe · ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    # Compilar no necesita escribir en el repositorio; solo el job `publicar`.
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, artifact: Sword-windows,   binary: dist/Sword.exe }
+          - { os: macos-latest,   artifact: Sword-macos,     binary: dist/Sword }
+          - { os: ubuntu-latest,  artifact: Sword-linux,     binary: dist/Sword }
 
     steps:
       - uses: actions/checkout@v4
@@ -20,24 +30,67 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
 
-      - name: Instalar dependencias
+      - name: Instalar Sword y PyInstaller
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt pyinstaller
+          pip install -r requirements.txt
+          pip install -e . --no-deps
+          pip install pyinstaller
 
-      - name: Compilar Sword.exe
+      - name: Compilar ejecutable
         run: pyinstaller --onefile --name Sword --console sword/cli.py
+
+      - name: Comprobar que arranca
+        shell: bash
+        run: |
+          chmod +x "${{ matrix.binary }}"
+          # --version es inocuo: valida que el binario arranca y encuentra sus
+          # dependencias empaquetadas sin tocar datos del usuario.
+          "${{ matrix.binary }}" --version
 
       - name: Subir ejecutable como artefacto
         uses: actions/upload-artifact@v4
         with:
-          name: Sword-windows
-          path: dist/Sword.exe
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}
 
-      - name: Publicar en GitHub Releases
-        if: startsWith(github.ref, 'refs/tags/v')
+  publicar:
+    name: Publicar en GitHub Releases
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: binarios
+
+      # Nota: `generate_release_notes` solo se aplica si `body` viene vacío, así
+      # que aquí se usa únicamente el body escrito a mano.
+      - name: Publicar los tres binarios
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/Sword.exe
-          generate_release_notes: true
+          files: binarios/**/*
+          body: |
+            ## Sword ${{ github.ref_name }}
+
+            | Sistema | Archivo | Cómo usarlo |
+            |---|---|---|
+            | Windows | `Sword-windows/Sword.exe` | Doble clic. No necesita Python. |
+            | macOS | `Sword-macos/Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
+            | Linux | `Sword-linux/Sword` | `chmod +x Sword` y luego `./Sword CARPETA` |
+
+            Ejemplo:
+
+            ```
+            Sword.exe C:\Usuarios\TuNombre\Escritorio\mis_excels
+            ```
+
+            ## Qué cambió
+
+            El detalle de cada versión está en el
+            [CHANGELOG](https://github.com/hericsolorzano-beep/Sword/blob/main/CHANGELOG.md).
