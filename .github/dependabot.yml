@@ -20,3 +20,12 @@ updates:
     schedule:
       interval: weekly
     labels: ["dependencies", "github-actions"]
+    ignore:
+      # Estas dos solo se ejecutan en el job `publicar`, que solo corre al
+      # publicar un tag. La CI no las ejercita, así que subirlas sin poder
+      # probarlas dejaría el release en manos de un cambio a ciegas. Se
+      # actualizan a mano publicando un tag de prueba.
+      - dependency-name: softprops/action-gh-release
+        update-types: ["version-update:semver-major"]
+      - dependency-name: actions/download-artifact
+        update-types: ["version-update:semver-major"]
